@@ -72,7 +72,7 @@ Each tab requires:
 Defines the hub name and game-specific configuration namespace.
 
 ```lua
-PrestineLib:Set("PrestineHub", "AnimeEternal")
+PrestineLib:Set("PrestineHub", "UnnamedGame")
 ```
 
 ---
