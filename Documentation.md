@@ -22,9 +22,7 @@ The library must be loaded before any GUI-related functions are called.
 
 ~~~lua
 -- Main Library (Required)
-local PrestineLib = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/PrestineScripts/PrestineLibrary/refs/heads/main/PrestineLib"
-))()
+local PrestineLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/PrestineScripts/PrestineLibrary/refs/heads/main/PrestineLib"))()
 ~~~
 
 Required: This script is mandatory and must be executed first.
