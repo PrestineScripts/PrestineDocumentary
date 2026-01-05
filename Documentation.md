@@ -128,6 +128,119 @@ Some libraries return a handle (like `statusParagraph`) so you can later update 
 
 ---
 
+# PrestineLib – AddParagraphBars Tutorial 📊
+
+## 1. Creating a Stats Paragraph with Bars
+
+```lua
+local stats = PrestineLib:AddParagraphBars({
+	Tab = "Main",
+	MainTitle = "Stats",
+	MainContent = "Progress Tracking",
+	Bars = {
+		{
+			Key = "xp",
+			Label = "XP",
+			Progress = 60,
+			Goal = 100,
+			Style = "Bar",
+			Emphasis = true
+		},
+		{
+			Key = "energy",
+			Label = "Energy",
+			Progress = 7,
+			Goal = 10,
+			Style = "Segments",
+			Segments = 12
+		}
+	}
+})
+```
+
+---
+
+## 2. Updating Existing Bars
+
+Use `SetProgress(key, value)` to update any bar by its key.
+
+```lua
+stats:SetProgress("xp", 80)
+stats:SetProgress("energy", 5)
+```
+
+---
+
+## 3. Adding a New Bar at Runtime
+
+Bars can be added after creation using `AddBar`.
+
+```lua
+stats:AddBar({
+	Key = "coins",
+	Label = "Coins",
+	Progress = 40,
+	Goal = 50,
+	Style = "Bar"
+})
+```
+
+---
+
+## 4. Updating a Newly Added Bar
+
+Once added, the bar can be updated like any other.
+
+```lua
+stats:SetProgress("coins", 50)
+```
+
+---
+
+## 5. Timed / Delayed Progress Updates
+
+Bars support updates over time (useful for XP gain, regen, etc).
+
+```lua
+task.delay(2, function()
+	stats:SetProgress("xp", 100)
+	stats:SetProgress("energy", 10)
+end)
+```
+
+---
+
+## 6. Bar Styles
+
+### Bar
+- Smooth continuous fill
+- Uses `Progress / Goal`
+
+```lua
+Style = "Bar"
+```
+
+### Segments
+- Discrete segmented display
+- Requires `Segments`
+
+```lua
+Style = "Segments"
+Segments = 12
+```
+
+---
+
+## 7. Returned Controller API
+
+```lua
+stats:SetProgress(key, value)
+stats:AddBar(barData)
+```
+
+These methods allow full runtime control over all bars inside the paragraph.
+
+
 ## AddNotification 🔔 (Popup Toast)
 
 ### What it does
