@@ -1,659 +1,281 @@
-# Prestine Library (PrestineLib) 📦
+# PrestineLib Documentation
 
-> Transcript Log 📜  
-> Subject: PrestineLib  
-> Author: R3LIG  
-> Type: Roblox GUI Library  
-> Status: Active ✅
+Welcome to the official, updated documentation for **PrestineLib**. This guide covers all available UI components, parameters, methods, and code examples based on the current library implementation.
 
 ---
 
-## Overview 🧭
+## Table of Contents
 
-Prestine Library (**PrestineLib**) is a lightweight Roblox GUI framework for creating hubs composed of **tabs**, **sections**, and **interactive UI components**.
+1. [Containers & Resolution](https://www.google.com/search?q=%23containers--resolution)
+2. [Layout Components](https://www.google.com/search?q=%23layout-components)
+* [AddDivider](https://www.google.com/search?q=%23adddivider)
+* [AddLabel](https://www.google.com/search?q=%23addlabel)
+* [AddSection](https://www.google.com/search?q=%23addsection)
 
-⚠️ The library enforces a **strict order of execution**. Deviating from this order may result in runtime failure or missing UI elements.
+
+3. [Content Components](https://www.google.com/search?q=%23content-components)
+* [AddParagraph](https://www.google.com/search?q=%23addparagraph)
+* [AddParagraphBars](https://www.google.com/search?q=%23addparagraphbars)
+
+
+4. [Interactive Components](https://www.google.com/search?q=%23interactive-components)
+* [AddButton](https://www.google.com/search?q=%23addbutton)
+* [AddToggle](https://www.google.com/search?q=%23addtoggle)
+* [AddTimedToggle](https://www.google.com/search?q=%23addtimedtoggle)
+* [AddSlider](https://www.google.com/search?q=%23addslider)
+* [AddDropdown](https://www.google.com/search?q=%23adddropdown)
+
+
+5. [Notifications](https://www.google.com/search?q=%23notifications)
+* [AddNotification](https://www.google.com/search?q=%23addnotification)
+* [AddInteractableNotif](https://www.google.com/search?q=%23addinteractablenotif)
+
+
 
 ---
 
-## Installation 🔧
+## Containers & Resolution
 
-The library must be loaded before any GUI-related functions are called.
+Most components accept a `params` table. To specify where elements are placed, you can provide either:
 
-~~~lua
--- Main Library (Required)
-local PrestineLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/PrestineScripts/PrestineLibrary/refs/heads/main/Initializer.lua"))()
-~~~
-
-Required: This script is mandatory and must be executed first.
+* **`Tab`**: A string representing the target tab name (e.g., `Tab = "Home"`).
+* **`Section`**: A reference object returned by `PrestineLib:AddSection(...)`.
 
 ---
 
-## Quick Start 🚀
+## Layout Components
 
-### Step 1: Create GUI Profile 🖥️
+### AddDivider
 
-Creates the main GUI window and defines its identity.
+Adds a subtle visual separator line to the container.
 
-~~~lua
-local PrestineGUI = PrestineLib:CreateGUI({
-    Title = "Prestine Hub | [Unnamed Game]",
-    SubTitle = "Made By R3LIG",
+```lua
+PrestineLib:AddDivider({
+    Tab = "Home" -- or Section = sectionRef
 })
-~~~
 
-Options:
-- Title (string): Main GUI title  
-- SubTitle (string): Secondary text displayed under the title  
+```
 
----
+### AddLabel
 
-### Step 2: Create Tabs 🗂️
+Displays a static text label.
 
-Tabs must be created before sections or UI components.
-
-~~~lua
-local Tabs = {
-    { Name = "Home", Icon = "rbxassetid://85741999712008" },
-    { Name = "Main", Icon = "rbxassetid://<assetid>" },
-}
-
-PrestineLib:CreateTab(Tabs)
-~~~
-
-Each tab requires:
-- Name (string)
-- Icon (rbxassetid)
-
----
-
-### Step 3: Set Configuration ⚙️
-
-Defines the hub name and game-specific configuration namespace.
-
-~~~lua
-PrestineLib:Set("PrestineHub", "UnnamedGame")
-~~~
-
----
-
-### Step 4: Add Sections 🧩
-
-Sections divide a tab into logical areas. **You must add a section before adding components into that tab.**
-
-~~~lua
-PrestineLib:AddSection({
+```lua
+PrestineLib:AddLabel({
     Tab = "Home",
-    MainTitle = "Home",
+    Name = "General Settings"
 })
-~~~
 
----
+```
 
-## Components Tutorials 🧪
+### AddSection
 
-Below, **every component has its own tutorial** with:
-- What it does
-- Required fields
-- Example
-- Callback behavior (if it has one)
+Creates a section header banner, which can optionally be collidable to hide/show subsequent elements.
 
-> Tip: The `Tab` value must match your tab name exactly (case-sensitive).
-
----
-
-## AddParagraph 📄 (Static Text)
-
-### What it does
-Creates a paragraph/text block for information, credits, status messages, etc.
-
-### Required Fields
-- Tab (string)
-- MainTitle (string)
-- paragraphSize (number)
-- MainContent (string)
-
-### Example
-~~~lua
-local statusParagraph = PrestineLib:AddParagraph({
+```lua
+local sectionRef = PrestineLib:AddSection({
     Tab = "Home",
-    MainTitle = "Status",
-    paragraphSize = 70,
-    MainContent = "Im the best"
+    MainTitle = "Combat Features",
+    Collidable = true -- Optional: enables collapsing child items when clicked
 })
-~~~
 
-### Notes
-Some libraries return a handle (like `statusParagraph`) so you can later update it if supported.
+```
 
 ---
 
-# PrestineLib – AddParagraphBars Tutorial 📊
+## Content Components
 
-## 1. Creating a Stats Paragraph with Bars
+### AddParagraph
+
+Displays a structured container with a title and multi-line textual content.
 
 ```lua
-local stats = PrestineLib:AddParagraphBars({
-	Tab = "Main",
-	MainTitle = "Stats",
-	MainContent = "Progress Tracking",
-	Bars = {
-		{
-			Key = "xp",
-			Label = "XP",
-			Progress = 60,
-			Goal = 100,
-			Style = "Bar",
-			Emphasis = true
-		},
-		{
-			Key = "energy",
-			Label = "Energy",
-			Progress = 7,
-			Goal = 10,
-			Style = "Segments",
-			Segments = 12
-		}
-	}
+local paragraph = PrestineLib:AddParagraph({
+    Tab = "Home",
+    MainTitle = "Information",
+    MainContent = "Welcome to the script hub."
 })
+
+-- Available Methods:
+paragraph:SetContent("Updated text content.")
+paragraph:SetTitle("New Title")
+
 ```
 
----
+### AddParagraphBars
 
-## 2. Updating Existing Bars
-
-Use `SetProgress(key, value)` to update any bar by its key.
+Displays progress bars or segmented trackers inside a styled paragraph box.
 
 ```lua
-stats:SetProgress("xp", 80)
-stats:SetProgress("energy", 5)
-```
-
----
-
-## 3. Adding a New Bar at Runtime
-
-Bars can be added after creation using `AddBar`.
-
-```lua
-stats:AddBar({
-	Key = "coins",
-	Label = "Coins",
-	Progress = 40,
-	Goal = 50,
-	Style = "Bar"
+local barsCard = PrestineLib:AddParagraphBars({
+    Tab = "Home",
+    MainTitle = "Statistics",
+    MainContent = "Current progress overview:",
+    Bars = {
+        { Key = "gold", Label = "Gold", Progress = 450, Goal = 1000, Style = "Bar" },
+        { Key = "level", Label = "Level", Progress = 8, Goal = 10, Style = "Segments", Segments = 10 }
+    }
 })
+
+-- Available Methods:
+barsCard:SetProgress("gold", 600)
+barsCard:SetGoal("gold", 1200)
+barsCard:AddBar({ Key = "xp", Label = "XP", Progress = 50, Goal = 100 })
+barsCard:SetTitle("Updated Stats")
+barsCard:SetContent("New description")
+
 ```
 
 ---
 
-## 4. Updating a Newly Added Bar
+## Interactive Components
 
-Once added, the bar can be updated like any other.
+### AddButton
 
-```lua
-stats:SetProgress("coins", 50)
-```
-
----
-
-## 5. Timed / Delayed Progress Updates
-
-Bars support updates over time (useful for XP gain, regen, etc).
+Creates an interactive action button with animations and visual click/hover feedback.
 
 ```lua
-task.delay(2, function()
-	stats:SetProgress("xp", 100)
-	stats:SetProgress("energy", 10)
-end)
-```
-
----
-
-## 6. Bar Styles
-
-### Bar
-- Smooth continuous fill
-- Uses `Progress / Goal`
-
-```lua
-Style = "Bar"
-```
-
-### Segments
-- Discrete segmented display
-- Requires `Segments`
-
-```lua
-Style = "Segments"
-Segments = 12
-```
-
----
-
-## 7. Returned Controller API
-
-```lua
-stats:SetProgress(key, value)
-stats:AddBar(barData)
-```
-
-These methods allow full runtime control over all bars inside the paragraph.
-
-
-## AddNotification 🔔 (Popup Toast)
-
-### What it does
-Shows a temporary notification pop-up.
-
-### Required Fields
-- TitleText (string)
-- ContentText (string)
-- Duration (number) seconds
-
-### Example
-~~~lua
-PrestineLib:AddNotification({
-    TitleText = "Saved",
-    ContentText = "Your settings were saved successfully.",
-    Duration = 3
-})
-~~~
-
-### Notes
-Use this after actions like saving configs, enabling features, finishing tasks, etc.
-
----
-
-## AddButton 🔘 (Click Action)
-
-### What it does
-Creates a clickable button that runs a function when pressed.
-
-### Required Fields
-- Tab (string)
-- MainName (string)
-- Callback (function)
-
-### Example
-~~~lua
 PrestineLib:AddButton({
     Tab = "Home",
-    MainName = "Button Title",
+    MainName = "Teleport to Spawn",
+    SubTitle = "Instant movement",
     Callback = function()
-        print("Clicked!")
+        print("Button clicked!")
     end
 })
-~~~
 
-### Callback
-Runs once every time the button is clicked.
+```
 
----
+### AddToggle
 
-## AddToggle 🔁 (On/Off Switch)
+Creates a toggle switch with state persistence and optional continuous loop execution (`WhileOn`).
 
-### What it does
-Creates a boolean toggle (true/false).
-
-### Required Fields
-- Tab (string)
-- MainName (string)
-- DefaultState (boolean)
-- Callback (function(Value))
-
-### Example
-~~~lua
-PrestineLib:AddToggle({
-    Tab = "Home",
-    MainName = "Toggle Title",
-    DefaultState = false,
-    Callback = function(Value)
-        print("Toggle:", Value)
-    end
-})
-~~~
-
-### Callback
-`Value` will be `true` or `false`.
-
----
-
-## AddDropdown 📋 (Choose Option)
-
-### What it does
-Creates a dropdown menu for picking one option, or multiple if `Multiple = true`.
-
-### Required Fields
-- Tab (string)
-- MainTitle (string)
-- ChoiceList (table)
-- Multiple (boolean)
-- DefaultChoice (table)
-- Callback (function(Value))
-
-### Example (Single Select)
-~~~lua
-PrestineLib:AddDropdown({
-    Tab = "Home",
-    MainTitle = "Select Choice",
-    ChoiceList = {"1", "2", "3", "4", "5", "67"},
-    Multiple = false,
-    DefaultChoice = {"1"},
-    Callback = function(Value)
-        print("Selected:", Value)
-    end
-})
-~~~
-
-### Notes
-- If `Multiple = false`, the callback usually returns a single selection.
-- If `Multiple = true`, it may return a table of chosen values (depends on library behavior).
-
----
-
-## AddInput ⌨️ (Text Box)
-
-### What it does
-Creates a text input field (user can type text).
-
-### Required Fields
-- Tab (string)
-- MainTitle (string)
-- PlaceHolder (string)
-- Callback (function(Value))
-
-### Example
-~~~lua
-PrestineLib:AddInput({
-    Tab = "Home",
-    MainTitle = "Input Title",
-    PlaceHolder = "Placeholder",
-    Callback = function(Value)
-        print("Typed:", Value)
-    end
-})
-~~~
-
-### Callback
-Returns what the user entered as a string.
-
----
-
-## AddSlider 🎚️ (Number Picker)
-
-### What it does
-Creates a slider with a min/max range and step increments.
-
-### Required Fields
-- Tab (string)
-- SliderTitle (string)
-- Min (number)
-- Max (number)
-- DefaultValue (number)
-- Increment (number)
-- Callback (function(Value))
-
-### Example
-~~~lua
-PrestineLib:AddSlider({
-    Tab = "Home",
-    SliderTitle = "Slider Title",
-    Min = 0,
-    Max = 300,
-    DefaultValue = 150,
-    Increment = 10,
-    Callback = function(Value)
-        print("Slider:", Value)
-    end
-})
-~~~
-
-### Callback
-Returns the current slider value (number).
-
----
-
-## AddKeybind ⌨️🗝️ (Key Toggle / Hotkey)
-
-### What it does
-Lets the user press a key to trigger an action.
-
-### Required Fields
-- Tab (string)
-- MainTitle (string)
-- DefaultKey (Enum.KeyCode)
-- Callback (function(key))
-
-### Example
-~~~lua
-PrestineLib:AddKeybind({
-    Tab = "Home",
-    MainTitle = "Toggle UI",
-    DefaultKey = Enum.KeyCode.RightShift,
-    Callback = function(key)
-        print("Pressed:", key.Name)
-        -- Example: PrestineGUI:Toggle() (if your GUI supports it)
-    end
-})
-~~~
-
-### Callback
-Returns the key pressed (usually the keybind key).
-
----
-
-## AddColorPicker 🎨 (Pick a Color)
-
-### What it does
-Creates a color picker for selecting Color3 values (great for themes/accent colors).
-
-### Required Fields
-- Tab (string)
-- MainName (string)
-- DefaultColor (Color3)
-- Callback (function(color))
-
-### Example
-~~~lua
-PrestineLib:AddColorPicker({
-    Tab = "Home",
-    MainName = "Accent Color",
-    DefaultColor = Color3.fromRGB(0, 140, 255),
-    Callback = function(color)
-        print("Color:", color)
-        -- Example usage: set accent theme if supported by your library
-    end
-})
-~~~
-
-### Callback
-Returns a `Color3` value.
-
----
-
-## AddTimedToggle ⏱️🔁 (Toggle With Timer / Hold)
-
-### What it does
-A toggle that behaves like an auto feature toggle (often used for autofarm/loop features).
-(Some libraries implement extra timing UI or timed activation — depends on the library.)
-
-### Required Fields
-- Tab (string)
-- MainName (string)
-- Callback (function(state))
-
-### Example
-~~~lua
-PrestineLib:AddTimedToggle({
+```lua
+local myToggle = PrestineLib:AddToggle({
     Tab = "Home",
     MainName = "Auto Farm",
+    Description = "Automatically collects items",
+    DefaultState = false,
     Callback = function(state)
-        print("Auto Farm:", state)
+        print("Toggle state:", state)
+    end,
+    WhileOn = function()
+        -- Code executed continuously while the toggle is active
+    end,
+    WhileCooldown = 0.2 -- Delay between loop iterations (seconds)
+})
 
-        -- Example loop pattern:
-        -- if state then
-        --     while state do
-        --         task.wait(0.25)
-        --         -- your farm code here
-        --     end
-        -- end
+-- Available Methods:
+myToggle:Set(true)
+local currentState = myToggle:Get()
+
+```
+
+### AddTimedToggle
+
+Creates a toggle paired with a configurable duration timer.
+
+```lua
+PrestineLib:AddTimedToggle({
+    Tab = "Home",
+    MainName = "Boost Timer",
+    DefaultState = false,
+    DefaultDuration = 30,
+    DefaultUnit = "s", -- Options: "s" (seconds), "m" (minutes), "h" (hours), "d" (days), "w" (weeks)
+    Callback = function(state)
+        print("Timed toggle state:", state)
     end
 })
-~~~
 
-### Callback
-`state` is true/false depending on toggle state.
+```
+
+### AddSlider
+
+Creates an interactive numerical range slider.
+
+```lua
+local mySlider = PrestineLib:AddSlider({
+    Tab = "Home",
+    MainName = "WalkSpeed",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Callback = function(value)
+        print("Slider value changed:", value)
+    end
+})
+
+-- Available Methods:
+mySlider:Set(50)
+local currentValue = mySlider:Get()
+
+```
+
+### AddDropdown
+
+Creates a selectable option menu containing a list of strings.
+
+```lua
+local myDropdown = PrestineLib:AddDropdown({
+    Tab = "Home",
+    MainName = "Select Target",
+    Options = {"Player1", "Player2", "Player3"},
+    Default = "Player1",
+    Callback = function(selected)
+        print("Dropdown selection:", selected)
+    end
+})
+
+-- Available Methods:
+myDropdown:Set("Player2")
+myDropdown:Refresh({"Player1", "Player2", "Player3", "Player4"}, "Player4")
+local currentSelection = myDropdown:Get()
+
+```
 
 ---
 
-## Complete Example Using Your Components 🧬
+## Notifications
 
-~~~lua
--- Load library (1)
-local PrestineLib = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/PrestineScripts/PrestineLibrary/refs/heads/main/Initializer.lua"
-))()
+### AddNotification
 
--- Create GUI (2)
-local PrestineGUI = PrestineLib:CreateGUI({
-    Title = "Prestine Hub | Example",
-    SubTitle = "Made By R3LIG",
-})
+Displays a standard popup notification message that auto-dismisses after the specified duration.
 
--- Create tabs (3)
-local Tabs = {
-    { Name = "Home", Icon = "rbxassetid://85741999712008" },
-}
-PrestineLib:CreateTab(Tabs)
-
--- Set config (4)
-PrestineLib:Set("PrestineHub", "ExampleGame")
-
--- Add section (5)
-PrestineLib:AddSection({
-    Tab = "Home",
-    MainTitle = "Home",
-})
-
--- Paragraph
-local statusParagraph = PrestineLib:AddParagraph({
-    Tab = "Home",
-    MainTitle = "Status",
-    paragraphSize = 70,
-    MainContent = "Im the best"
-})
-
--- Notification
+```lua
 PrestineLib:AddNotification({
-    TitleText = "Saved",
-    ContentText = "Your settings were saved successfully.",
+    TitleText = "Success",
+    ContentText = "Your settings have been successfully saved.",
     Duration = 3
 })
 
--- Button
-PrestineLib:AddButton({
-    Tab = "Home",
-    MainName = "Button Title",
-    Callback = function()
-        print("Button clicked")
+```
+
+### AddInteractableNotif
+
+Displays an interactive notification with custom choice buttons and timeout handling.
+
+```lua
+PrestineLib:AddInteractableNotif({
+    TitleText = "Confirmation",
+    ContentText = "Are you sure you want to execute this action?",
+    Duration = 5, -- Optional timeout
+    Choices = {
+        {
+            Text = "Confirm",
+            Callback = function()
+                print("Confirmed!")
+            end
+        },
+        {
+            Text = "Cancel",
+            Callback = function()
+                print("Cancelled!")
+            end
+        }
+    },
+    OnTimeout = function()
+        print("Notification timed out.")
     end
 })
 
--- Toggle
-PrestineLib:AddToggle({
-    Tab = "Home",
-    MainName = "Toggle Title",
-    DefaultState = false,
-    Callback = function(Value)
-        print(Value)
-    end
-})
-
--- Dropdown
-PrestineLib:AddDropdown({
-    Tab = "Home",
-    MainTitle = "Select Choice",
-    ChoiceList = {"1", "2", "3", "4", "5", "67"},
-    Multiple = false,
-    DefaultChoice = {"1"},
-    Callback = function(Value)
-        print(Value)
-    end
-})
-
--- Input
-PrestineLib:AddInput({
-    Tab = "Home",
-    MainTitle = "Input Title",
-    PlaceHolder = "Placeholder",
-    Callback = function(Value)
-        print(Value)
-    end
-})
-
--- Slider
-PrestineLib:AddSlider({
-    Tab = "Home",
-    SliderTitle = "Slider Title",
-    Min = 0,
-    Max = 300,
-    DefaultValue = 150,
-    Increment = 10,
-    Callback = function(Value)
-        print(Value)
-    end
-})
-
--- Keybind
-PrestineLib:AddKeybind({
-    Tab = "Home",
-    MainTitle = "Toggle UI",
-    DefaultKey = Enum.KeyCode.RightShift,
-    Callback = function(key)
-        print(key)
-    end
-})
-
--- Color Picker
-PrestineLib:AddColorPicker({
-    Tab = "Home",
-    MainName = "Accent Color",
-    DefaultColor = Color3.fromRGB(0, 140, 255),
-    Callback = function(color)
-        print(color)
-    end
-})
-
--- Timed Toggle
-PrestineLib:AddTimedToggle({
-    Tab = "Home",
-    MainName = "Auto Farm",
-    Callback = function(state)
-        print(state)
-    end
-})
-~~~
-
----
-
-## Notes 📝
-
-Execution order is mandatory:
-
-1. Load library  
-2. Create GUI  
-3. Create tabs  
-4. Set config  
-5. Add sections  
-6. Add components  
-
-Tab names must match exactly.
-
----
-
-## License 📄
-
-Free to use.  
-Do not resell as your own library.  
-Credit the author (R3LIG).
+```
