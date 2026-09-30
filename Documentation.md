@@ -10,7 +10,7 @@
 
 ## Overview 🧭
 
-**Prestine Library (PrestineLib)** is a lightweight, responsive Roblox GUI framework built for creating modular hubs composed of tabs, collapsible sections, interactive controls, real-time trackers, floating panels, and queued notifications.
+**Prestine Library (PrestineLib)** is a lightweight, responsive Roblox GUI framework built for creating modular hubs composed of collapsible tab groups, content sections, interactive controls, live progress trackers, floating panels, and queued notifications.
 
 > ⚠️ **Strict Execution Order:** The library requires components and profiles to be initialized in a specific sequential order. Deviating from this order may cause runtime failures or missing UI elements.
 
@@ -18,7 +18,7 @@
 
 ## Installation 🔧
 
-The library must be fetched and initialized before calling any GUI construction methods:
+The library must be loaded before any GUI-related functions are called:
 
 ```lua
 -- Main Library (Required)
@@ -34,7 +34,7 @@ local PrestineLib = loadstring(game:HttpGet(
 
 ### Step 1: Create GUI Profile 🖥️
 
-Creates the primary screen GUI framework and configures main header metadata.
+Creates the main window framework and defines its title metadata.
 
 ```lua
 local PrestineGUI = PrestineLib:CreateGUI({
@@ -44,37 +44,99 @@ local PrestineGUI = PrestineLib:CreateGUI({
 
 ```
 
-### Step 2: Create Tabs 🗂️
+### Step 2: Create Tabs & Collapsible Tab Groups 🗂️
 
-Tabs must be registered before adding sections or components.
+Tabs must be registered before adding sections or components. `PrestineLib:CreateTab` supports two setups: **Collapsible Tab Categories (Sections)** and **Flat Tabs**.
+
+#### Option A: Collapsible Tab Groups (Sidebar Sections)
+
+Groups sub-tabs under an accordion header that can start opened or closed:
+
+* **Group Fields:**
+* `Section` *(string)*: Label text for the category header.
+* `Icon` *(string / assetid)*: Category icon name or asset ID.
+* `Open` *(boolean)*: Initial accordion visibility state (`true` for expanded, `false` for collapsed).
+* `Tabs` *(table)*: Array of sub-tabs contained within this group:
+* `Name` *(string)*: Tab name. Must match the `Tab` parameter when registering components.
+
+
+* `LayoutOrder` *(number, optional)*: Explicit ordering position.
+
+
+
+
 
 ```lua
-local Tabs = {
-    { Name = "Home", Icon = "rbxassetid://85741999712008" },
-    { Name = "Main", Icon = "rbxassetid://85741999712008" },
+local AllTabs = {
+    {
+        Section = "Dashboard",
+        Icon = "Home",
+        Open = true, -- Starts expanded
+        Tabs = {
+            { Name = "Home", LayoutOrder = 1 },
+            { Name = "Lobby", LayoutOrder = 2 }
+        }
+    },
+    {
+        Section = "Automation",
+        Icon = "Automatic",
+        Open = false, -- Starts collapsed
+        Tabs = {
+            { Name = "Auto", LayoutOrder = 3 },
+            { Name = "Main", LayoutOrder = 4 },
+            { Name = "Stuff", LayoutOrder = 5 }
+        }
+    },
+    {
+        Section = "Configuration",
+        Icon = "Settings",
+        Open = false,
+        Tabs = {
+            { Name = "Player", LayoutOrder = 6 },
+            { Name = "Performance", LayoutOrder = 7 },
+            { Name = "Utility", LayoutOrder = 8 },
+            { Name = "Settings", LayoutOrder = 9 },
+            { Name = "Config", LayoutOrder = 10 }
+        }
+    }
 }
-PrestineLib:CreateTab(Tabs)
+
+PrestineLib:CreateTab(AllTabs)
+
+```
+
+#### Option B: Flat Tab Array
+
+A basic list of tabs without sidebar grouping:
+
+```lua
+local FlatTabs = {
+    { Name = "Home", Icon = "rbxassetid://85741999712008" },
+    { Name = "Main", Icon = "rbxassetid://85741999712008" }
+}
+
+PrestineLib:CreateTab(FlatTabs)
 
 ```
 
 ### Step 3: Set Configuration Namespace ⚙️
 
-Specifies configuration keys used for saving/loading states automatically.
+Defines the hub name and game configuration identity for state saving.
 
 ```lua
 PrestineLib:Set("PrestineHub", "GameNamespace")
 
 ```
 
-### Step 4: Add Sections & Layout 🧩
+### Step 4: Add In-Tab Sections 🧩
 
-Add logical section headers to your tabs before populating them with interactive elements.
+Divides individual tab content areas into visual groups before adding controls.
 
 ```lua
-local combatSection = PrestineLib:AddSection({
-    Tab = "Home",
+local combatSec = PrestineLib:AddSection({
+    Tab = "Auto",
     MainTitle = "Combat Features",
-    Collidable = true -- Enables collapse/expand behavior for items below it
+    Collidable = true -- Enables click-to-collapse for elements below it
 })
 
 ```
@@ -85,8 +147,12 @@ local combatSection = PrestineLib:AddSection({
 
 Components accept a configuration table containing target placement parameters:
 
-* `Tab` *(string)*: Case-sensitive name of the target tab.
+* `Tab` *(string)*: Case-sensitive name of the target tab (matches the sub-tab's `Name`).
+
+
 * `Section` *(Instance/Reference)*: A reference returned by `PrestineLib:AddSection(...)`. When provided, elements nest directly beneath that section.
+
+
 
 ---
 
@@ -96,18 +162,24 @@ Components accept a configuration table containing target placement parameters:
 
 #### `AddSection`
 
-Creates an accented banner dividing elements into groups. Supports collapsible toggling.
+Creates an accented banner dividing elements into groups. Supports collapsible toggling for child components.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainTitle` *(string)*: Header text.
-* `Collidable` *(boolean, optional)*: Enables click-to-collapse functionality for following components in the container.
+
+
+* `Collidable` *(boolean, optional)*: Enables click-to-collapse functionality for items following this section.
+
+
 
 
 
 ```lua
 local combatSec = PrestineLib:AddSection({
-    Tab = "Home",
+    Tab = "Auto",
     MainTitle = "Combat Features",
     Collidable = true
 })
@@ -120,30 +192,36 @@ Renders an unobtrusive static label line.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `Name` *(string)*: Text string to display.
+
+
 
 
 
 ```lua
 PrestineLib:AddLabel({
-    Tab = "Home",
-    Name = "Player Enhancements"
+    Tab = "Auto",
+    Name = "Target Priority"
 })
 
 ```
 
 #### `AddDivider`
 
-Inserts a subtle gradient line separator between components.
+Inserts a subtle gradient separator line between components.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
 
 
 
+
+
 ```lua
 PrestineLib:AddDivider({
-    Tab = "Home"
+    Tab = "Auto"
 })
 
 ```
@@ -154,18 +232,28 @@ PrestineLib:AddDivider({
 
 #### `AddParagraph`
 
-A card displaying a formatted header and multi-line body text.
+A container displaying a formatted title and multi-line body text.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainTitle` *(string)*: Card title.
+
+
 * `MainContent` *(string)*: Card body text.
-* `paragraphSize` *(number, optional)*: Total vertical frame height (default: `80`).
+
+
+* `paragraphSize` *(number, optional)*: Total frame height (default: `80`).
+
+
 
 
 * **Controller Methods:**
 * `paragraph:SetTitle(newTitle)`
+
 * `paragraph:SetContent(newContent)`
+
 
 
 
@@ -183,34 +271,67 @@ statusCard:SetContent("Updated server notice.")
 
 #### `AddParagraphBars`
 
-Displays progress bars and segmented trackers inside a stylized card. Supports dynamic runtime additions and removals.
+Displays progress bars and segmented trackers inside a styled card. Supports dynamic runtime updates, additions, and removals.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainTitle` *(string)*: Card title.
+
+
 * `MainContent` *(string, optional)*: Subtitle/description.
+
+
 * `ShowContent` *(boolean, optional)*: Set `false` to hide body text.
+
+
 * `Compact` *(boolean, optional)*: Applies tighter padding and typography.
+
+
 * `Bars` *(table)*: List of progress bar definitions:
+
+
 * `Key` *(string)*: Unique identifier.
+
+
 * `Label` *(string)*: Metric label.
+
+
 * `Progress` *(number)*: Current value.
+
+
 * `Goal` *(number)*: Maximum limit.
+
+
 * `Style` *(string)*: `"Bar"` (smooth fill) or `"Segments"` (discrete notches).
+
+
 * `Segments` *(number, optional)*: Number of segments if style is `"Segments"` (default: `12`).
+
+
 * `Emphasis` *(boolean, optional)*: Brightens text and accent styling.
+
+
 
 
 
 
 * **Controller Methods:**
 * `bars:SetProgress(keyOrIndex, value, tweenTime)`
+
 * `bars:SetGoal(keyOrIndex, newGoal, tweenTime)`
+
 * `bars:AddBar(barDef)`
+
 * `bars:RemoveBar(keyOrIndex)`
+
 * `bars:GetBar(keyOrIndex)`
+
 * `bars:SetTitle(title)`
+
 * `bars:SetContent(content)`
+
 
 
 
@@ -245,27 +366,41 @@ playerStats:SetProgress("xp", 800)
 
 #### `AddPanel`
 
-Creates an independent, draggable floating side-window linked to an inline activation toggle button.
+Creates a draggable floating side window linked to an in-tab activation toggle button.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab containing the toggle button.
+
+
 * `Title` *(string)*: Title displayed on the panel and toggle.
+
+
 * `DefaultState` *(boolean, optional)*: Initial visibility state (default: `false`).
+
+
 * `Content` *(string, optional)*: Initial multiline text content.
+
+
 * `isExempted` *(boolean, optional)*: Skips persistent save state.
+
+
 
 
 * **Controller Methods:**
 * `panel:SetContent(newContent)`
+
 * `panel:AddLine(newLine)`
+
 * `panel:SetVisible(boolean)`
+
 * `panel:GetVisible()`
+
 
 
 
 ```lua
 local debugPanel = PrestineLib:AddPanel({
-    Tab = "Home",
+    Tab = "Utility",
     Title = "Event Log",
     DefaultState = false,
     Content = "[System Initialized]"
@@ -281,19 +416,27 @@ debugPanel:AddLine("Hooked entity events.")
 
 #### `AddButton`
 
-Interactive action button with ripple effects, particle animations, and chevron transitions.
+Action button with ripple effects, particle animations, and chevron transitions.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainName` *(string)*: Button text.
+
+
 * `SubTitle` *(string, optional)*: Secondary descriptive text.
+
+
 * `Callback` *(function)*: Fires on activation.
+
+
 
 
 
 ```lua
 PrestineLib:AddButton({
-    Tab = "Home",
+    Tab = "Auto",
     MainName = "Teleport to Safezone",
     SubTitle = "Bypasses combat tag",
     Callback = function()
@@ -305,28 +448,46 @@ PrestineLib:AddButton({
 
 #### `AddToggle`
 
-Stateful on/off switch with persistent configuration support and an integrated continuous loop runner.
+Stateful on/off switch with persistent configuration support and an integrated loop runner (`WhileOn`).
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainName` *(string)*: Control label.
+
+
 * `Description` *(string, optional)*: Explanatory subtitle below label.
-* `DefaultState` *(boolean, optional)*: Initial on/off state (default: `false`).
+
+
+* `DefaultState` *(boolean, optional)*: Initial state (default: `false`).
+
+
 * `isExempted` *(boolean, optional)*: Skips configuration persistence.
+
+
 * `Callback` *(function(state))*: Fires whenever the toggle state changes.
-* `WhileOn` *(function, optional)*: Loops automatically while toggle is `true`.
+
+
+* `WhileOn` *(function, optional)*: Runs continuously while toggle is `true`.
+
+
 * `WhileCooldown` *(number, optional)*: Delay between loop iterations in seconds (default: `0.1`).
+
+
 
 
 * **Controller Methods:**
 * `toggle:Set(boolean)`
+
 * `toggle:Get()`
+
 
 
 
 ```lua
 local farmToggle = PrestineLib:AddToggle({
-    Tab = "Home",
+    Tab = "Auto",
     MainName = "Auto Collect",
     Description = "Sweeps collectible drops within range",
     DefaultState = false,
@@ -343,18 +504,24 @@ local farmToggle = PrestineLib:AddToggle({
 
 #### `AddSaveToggle`
 
-A streamlined shortcut toggle explicitly dedicated to toggling configuration auto-saving (`_G.isSavingGV`).
+A shortcut toggle dedicated to setting configuration auto-saving (`_G.isSavingGV`).
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainName` *(string)*: Label name.
+
+
 * `DefaultState` *(boolean)*: Initial state.
+
+
 
 
 
 ```lua
 PrestineLib:AddSaveToggle({
-    Tab = "Home",
+    Tab = "Settings",
     MainName = "Auto Save Config",
     DefaultState = true
 })
@@ -363,28 +530,47 @@ PrestineLib:AddSaveToggle({
 
 #### `AddTimedToggle`
 
-A toggle paired with an integrated duration input and countdown unit selector. Can run in `AutoOff` or `AutoOn` modes.
+A toggle paired with an integrated duration input and unit selector. Can run in `AutoOff` or `AutoOn` modes.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainName` *(string)*: Toggle label.
+
+
 * `DefaultState` *(boolean, optional)*: Initial state (default: `false`).
+
+
 * `DefaultDuration` *(number, optional)*: Duration limit (default: `10`).
+
+
 * `DefaultUnit` *(string, optional)*: `"s"`, `"m"`, `"h"`, `"d"`, or `"w"` (default: `"s"`).
+
+
 * `Mode` *(string, optional)*: `"AutoOff"` or `"AutoOn"` (default: `"AutoOff"`).
+
+
 * `Callback` *(function(state))*: Callback triggered on state flip.
+
+
 
 
 * **Controller Methods:**
 * `timedToggle:Set(tableOrBool)`: Supports `{ State = true, Duration = 60, Unit = "s" }` or boolean.
+
+
 * `timedToggle:Get()`: Returns `toggleState, durationVal, unitVal`.
+
+
 * `timedToggle:SetTimer(duration, unit)`
+
 
 
 
 ```lua
 local timedBoost = PrestineLib:AddTimedToggle({
-    Tab = "Home",
+    Tab = "Auto",
     MainName = "Speed Burst",
     DefaultState = false,
     DefaultDuration = 30,
@@ -399,28 +585,45 @@ local timedBoost = PrestineLib:AddTimedToggle({
 
 #### `AddDropdown`
 
-Selectable menu supporting both single-choice selection and multi-choice filtering, real-time search queries, and dynamic option updates.
+Selectable menu supporting single-choice selection, multi-choice filtering, real-time search queries, and dynamic option updates.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainTitle` *(string)*: Dropdown label.
+
+
 * `Description` *(string, optional)*: Explanatory subtitle below label.
+
+
 * `ChoiceList` *(table)*: Array of string selections.
+
+
 * `Multiple` *(boolean, optional)*: Enables multi-item selection (default: `false`).
+
+
 * `DefaultChoice` *(string/table, optional)*: Initially active choice(s).
+
+
 * `Callback` *(function(selected))*: Passes selection (string if single, array if multiple).
+
+
 
 
 * **Controller Methods:**
 * `dropdown:UpdateDropdown(newList)`
+
 * `dropdown:Set(selection)`
+
 * `dropdown:Close()`
+
 
 
 
 ```lua
 local targetDropdown = PrestineLib:AddDropdown({
-    Tab = "Home",
+    Tab = "Auto",
     MainTitle = "Select Targets",
     Description = "Choose one or more entities to track",
     ChoiceList = {"Alpha", "Bravo", "Charlie", "Delta"},
@@ -437,16 +640,30 @@ targetDropdown:UpdateDropdown({"Echo", "Foxtrot", "Golf"})
 
 #### `AddSlider`
 
-A numerical slider featuring live input dragging, bounce-trail visual feedback, and step increments.
+A numerical slider featuring live input dragging, bounce-trail feedback, and step increments.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `SliderTitle` *(string)*: Slider label.
+
+
 * `Min` *(number)*: Lower boundary.
+
+
 * `Max` *(number)*: Upper boundary.
+
+
 * `DefaultValue` *(number)*: Starting value.
+
+
 * `Increment` *(number, optional)*: Snapping step interval (default: `1`).
+
+
 * `Callback` *(function(value))*: Fires when value changes.
+
+
 
 
 * **Controller Methods:**
@@ -454,9 +671,10 @@ A numerical slider featuring live input dragging, bounce-trail visual feedback, 
 
 
 
+
 ```lua
 local speedSlider = PrestineLib:AddSlider({
-    Tab = "Home",
+    Tab = "Player",
     SliderTitle = "WalkSpeed",
     Min = 16,
     Max = 250,
@@ -475,9 +693,17 @@ A validated text input field with animated focus and commit states.
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainTitle` *(string)*: Input label.
+
+
 * `PlaceHolder` *(string)*: Placeholder text.
+
+
 * `Callback` *(function(text))*: Triggers when focus is lost.
+
+
 
 
 * **Controller Methods:**
@@ -485,9 +711,10 @@ A validated text input field with animated focus and commit states.
 
 
 
+
 ```lua
 PrestineLib:AddInput({
-    Tab = "Home",
+    Tab = "Config",
     MainTitle = "Webhook URL",
     PlaceHolder = "https://...",
     Callback = function(text)
@@ -503,21 +730,31 @@ Interactive key selector listening for keyboard inputs with formatting and live 
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainTitle` *(string)*: Keybind label.
+
+
 * `DefaultKey` *(Enum.KeyCode)*: Default trigger key.
+
+
 * `Callback` *(function(key))*: Fires when a new key is mapped.
+
+
 
 
 * **Controller Methods:**
 * `keybind:SetKey(keyCodeOrString)`
+
 * `keybind:GetKey()`
+
 
 
 
 ```lua
 PrestineLib:AddKeybind({
-    Tab = "Home",
-    MainTitle = "Quick Toggle",
+    Tab = "Settings",
+    MainTitle = "Menu Toggle",
     DefaultKey = Enum.KeyCode.RightControl,
     Callback = function(key)
         print("Bound key:", key.Name)
@@ -532,20 +769,30 @@ Color selector with direct numerical RGB input boxes and a clickable quick-cycle
 
 * **Parameters:**
 * `Tab` *(string)*: Target tab name.
+
+
 * `MainName` *(string)*: Label text.
+
+
 * `DefaultColor` *(Color3)*: Initial Color3 value.
+
+
 * `Callback` *(function(color3))*: Fires whenever the color updates.
+
+
 
 
 * **Controller Methods:**
 * `colorPicker:SetColor(color3OrTable)`
+
 * `colorPicker:GetColor()`
+
 
 
 
 ```lua
 local espColor = PrestineLib:AddColorPicker({
-    Tab = "Home",
+    Tab = "Performance",
     MainName = "ESP Color",
     DefaultColor = Color3.fromRGB(0, 170, 255),
     Callback = function(color)
@@ -606,7 +853,7 @@ PrestineLib:AddInteractableNotif({
 
 ---
 
-## Full Implementation Example 🧬
+## Complete Example Using Tab Groups 🧬
 
 ```lua
 -- 1. Load library
@@ -616,23 +863,50 @@ local PrestineLib = loadstring(game:HttpGet(
 
 -- 2. Create GUI Window
 local PrestineGUI = PrestineLib:CreateGUI({
-    Title = "Prestine Hub | Full Demo",
+    Title = "Prestine Hub | Complete Build",
     SubTitle = "Made By R3LIG",
 })
 
--- 3. Register Tabs
-PrestineLib:CreateTab({
-    { Name = "Home", Icon = "rbxassetid://85741999712008" },
-    { Name = "Settings", Icon = "rbxassetid://85741999712008" }
-})
+-- 3. Register Collapsible Tab Groups
+local AllTabs = {
+    {
+        Section = "Dashboard",
+        Icon = "Home",
+        Open = true,
+        Tabs = {
+            { Name = "Home", LayoutOrder = 1 },
+            { Name = "Lobby", LayoutOrder = 2 }
+        }
+    },
+    {
+        Section = "Automation",
+        Icon = "Automatic",
+        Open = false,
+        Tabs = {
+            { Name = "Auto", LayoutOrder = 3 },
+            { Name = "Main", LayoutOrder = 4 }
+        }
+    },
+    {
+        Section = "Configuration",
+        Icon = "Settings",
+        Open = false,
+        Tabs = {
+            { Name = "Player", LayoutOrder = 5 },
+            { Name = "Settings", LayoutOrder = 6 }
+        }
+    }
+}
+
+PrestineLib:CreateTab(AllTabs)
 
 -- 4. Set Config Identity
 PrestineLib:Set("PrestineHub", "DemoBuild")
 
 -- 5. Add Sections
-local homeSec = PrestineLib:AddSection({
-    Tab = "Home",
-    MainTitle = "Main Controls",
+local combatSec = PrestineLib:AddSection({
+    Tab = "Auto",
+    MainTitle = "Auto Farm Setup",
     Collidable = true
 })
 
@@ -640,7 +914,7 @@ local homeSec = PrestineLib:AddSection({
 PrestineLib:AddParagraph({
     Tab = "Home",
     MainTitle = "Welcome",
-    MainContent = "PrestineLib setup is complete and functional."
+    MainContent = "PrestineLib setup with grouped collapsible tabs."
 })
 
 local tracker = PrestineLib:AddParagraphBars({
@@ -659,23 +933,10 @@ local logger = PrestineLib:AddPanel({
     Content = "Console ready."
 })
 
-PrestineLib:AddButton({
-    Tab = "Home",
-    MainName = "Ping Notification",
-    SubTitle = "Fires a toast",
-    Callback = function()
-        PrestineLib:AddNotification({
-            TitleText = "Alert",
-            ContentText = "Button triggered successfully!",
-            Duration = 2.5
-        })
-    end
-})
-
 PrestineLib:AddToggle({
-    Tab = "Home",
-    MainName = "Auto Farm",
-    Description = "Continuous entity harvest",
+    Tab = "Auto",
+    MainName = "Auto Collect",
+    Description = "Sweeps items within proximity",
     DefaultState = false,
     WhileCooldown = 0.5,
     WhileOn = function()
@@ -684,53 +945,40 @@ PrestineLib:AddToggle({
 })
 
 PrestineLib:AddTimedToggle({
-    Tab = "Home",
-    MainName = "Double XP Potion",
+    Tab = "Auto",
+    MainName = "Speed Burst",
     DefaultDuration = 15,
     DefaultUnit = "s",
     Mode = "AutoOff"
 })
 
 PrestineLib:AddSlider({
-    Tab = "Home",
-    SliderTitle = "Speed Boost",
+    Tab = "Player",
+    SliderTitle = "WalkSpeed",
     Min = 16,
-    Max = 120,
+    Max = 150,
     DefaultValue = 16,
     Increment = 2
 })
 
 PrestineLib:AddDropdown({
-    Tab = "Home",
+    Tab = "Auto",
     MainTitle = "Target Mode",
-    Description = "Filter priority list",
     ChoiceList = {"Players", "NPCs", "Chests"},
     Multiple = false,
     DefaultChoice = "NPCs"
 })
 
-PrestineLib:AddColorPicker({
-    Tab = "Home",
-    MainName = "Visual Accent",
-    DefaultColor = Color3.fromRGB(110, 160, 235)
-})
-
-PrestineLib:AddInput({
-    Tab = "Home",
-    MainTitle = "Player Nickname",
-    PlaceHolder = "Enter text..."
+PrestineLib:AddSaveToggle({
+    Tab = "Settings",
+    MainName = "Auto Save Config",
+    DefaultState = true
 })
 
 PrestineLib:AddKeybind({
-    Tab = "Home",
+    Tab = "Settings",
     MainTitle = "Menu Toggle",
     DefaultKey = Enum.KeyCode.RightShift
-})
-
-PrestineLib:AddSaveToggle({
-    Tab = "Settings",
-    MainName = "Save Settings",
-    DefaultState = true
 })
 
 ```
